@@ -21,6 +21,8 @@ var fs = require('fs');
 var util = require("util");
 var http2 = require("http2");
 var sqlite3 = require("sqlite3").verbose();
+var forge = require('node-forge');
+var SHA3 = require('sha3');
 
 function PeerDb(file) {
     this.db = new sqlite3.Database(file);
@@ -86,8 +88,19 @@ server.on('request', function(request, response) {
 		parts[1] === "peer") {
 		var cert = request.socket.getPeerCertificate();
 		var fingerprint = null;
-		if (cert) {
-		    fingerprint = cert.fingerprint;
+		if (cert && cert.raw) {
+		    try {
+			var c = forge.pki.certificateFromAsn1(forge.asn1.fromDer(forge.util.createBuffer(cert.raw)));
+			var key = forge.pki.publicKeyToAsn1(cert.publicKey);
+			var keyBuffer = forge.asn1.toDer(key);
+			var derKey = pki.publicKeyToAsn1(cert.publicKey);
+			var d = new SHA3.SHA3Hash(224);
+
+			d.update(keyBuffer.data,'raw');
+			fingerprint = forge.util.encode64( d.digest('raw') ).replace( '-', '' );
+		    } catch (err) {
+			console.log( err );
+		    }
 		}
 		if (fingerprint) {
 		    request.on('data', function(data) {
