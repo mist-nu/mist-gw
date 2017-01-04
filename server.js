@@ -91,11 +91,19 @@ server.on('request', function(request, response) {
 		}
 		if (fingerprint) {
 		    request.on('data', function(data) {
-			    peerDb.setPeers(fingerprint, JSON.parse(data));
-			    response.writeHead(200, {"Content-Type": "application/json"});
-			    response.end(JSON.stringify(true));
-			    console.log('TEST: Setting peer with fingerprint ' + fingerprint +
+			    try {
+				    peerDb.setPeers(fingerprint, JSON.parse(data));
+				    response.writeHead(200, {"Content-Type": "application/json"});
+				    response.end(JSON.stringify(true));
+				    console.log('TEST: Setting peer with fingerprint ' + fingerprint +
 					'to ' + data);
+			    } catch(e) {
+				    response.writeHead(400, 'Bad Request');
+				    response.end('Bad JSON data');
+				    console.log('Bad JSON data from ' + fingerprint +
+					': ' + data);
+
+			    }	    
 			});
 		    request.on('end', function() {
 			});
