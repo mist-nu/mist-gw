@@ -11,7 +11,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "http2": "^3.3.6",
-    "sha3": "^1.2.0",
+    "js-sha3": "^0.5.7",
+    "node-forge": "^0.6.46",
     "sqlite3": "^3.1.8"
   }
 }
