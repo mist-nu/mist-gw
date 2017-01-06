@@ -72,7 +72,7 @@ server.on('request', function(request, response) {
 	    if (parts.length === 3 &&
             parts[0] === "" &&
 		parts[1] === "peer") {
-		var fingerprint = parts[2];
+		var fingerprint = unescape(parts[2]);
 		peerDb.getPeers(fingerprint, function(peers) {
 			response.writeHead(200, {"Content-Type": "application/json"});
 			response.end(JSON.stringify(peers));
@@ -94,7 +94,7 @@ server.on('request', function(request, response) {
 			var key = forge.pki.publicKeyToAsn1(c.publicKey);
 			var keyBuffer = forge.asn1.toDer(key);
 
-			fingerprint = new Buffer(sha3.sha3_224(new Buffer(keyBuffer.toHex(), 'hex')),'hex').toString('base64').replace( /=/g, '' );
+			fingerprint = new Buffer(sha3.sha3_256(new Buffer(keyBuffer.toHex(), 'hex')),'hex').toString('base64');
 		    } catch (err) {
 			console.log( err );
 		    }
